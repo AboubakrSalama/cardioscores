@@ -108,6 +108,82 @@
     return s.join('');
   }
 
+  /* HeartMate 3 survival: Cox S(t)=S0(t)^exp(LP). Baseline cumulative hazard anchored
+   * at S0(1yr)=0.9928, S0(2yr)=0.9880 (from the authors' official HM3RS calculator),
+   * interpolated piecewise-linearly in cumulative hazard between 0, 12 and 24 months. */
+  function hm3Surv(score, months) {
+    var H12 = 0.0072256, H24 = 0.0120718; // -ln(0.9928), -ln(0.9880)
+    var H0 = months <= 12 ? H12 * (months / 12) : H12 + (H24 - H12) * ((months - 12) / 12);
+    return Math.exp(-H0 * Math.exp(score));
+  }
+
+  /* HM3RS survival-curve graph: the three risk-group curves (as in the paper) with the
+   * patient's predicted survival plotted as dots at 1 and 2 years. */
+  function hm3Graph(patientScore) {
+    var X0 = 52, X1 = 452, YT = 30, YB = 240;
+    function mx(t) { return X0 + (t / 24) * (X1 - X0); }
+    function my(p) { return YB - (p / 100) * (YB - YT); }
+    function r1(n) { return Math.round(n * 10) / 10; }
+    var GREEN = '#1e8e3e', AMBER = '#b8860b', RED = '#c62828', BLUE = '#0f4c81';
+    var groups = [
+      { sc: 1.96, c: GREEN, lab: 'Higher-than-avg' },
+      { sc: 2.69, c: AMBER, lab: 'Average' },
+      { sc: 3.41, c: RED, lab: 'Lower-than-avg' }
+    ];
+    function curve(sc) {
+      var pts = [];
+      for (var t = 0; t <= 24; t += 2) pts.push(r1(mx(t)) + ',' + r1(my(100 * hm3Surv(sc, t))));
+      return pts.join(' ');
+    }
+    var s = [];
+    s.push('<svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg" font-family="inherit" fill="currentColor">');
+    s.push('<text x="240" y="18" text-anchor="middle" font-size="13" font-weight="700">HeartMate 3 predicted survival</text>');
+    // y gridlines + labels
+    [0, 25, 50, 75, 100].forEach(function (p) {
+      var y = r1(my(p));
+      s.push('<line x1="' + X0 + '" y1="' + y + '" x2="' + X1 + '" y2="' + y + '" stroke="currentColor" stroke-opacity="0.12"/>');
+      s.push('<text x="' + (X0 - 6) + '" y="' + (y + 4) + '" text-anchor="end" font-size="10" fill-opacity="0.75">' + p + '</text>');
+    });
+    s.push('<text x="16" y="' + r1((YT + YB) / 2) + '" text-anchor="middle" font-size="10" fill-opacity="0.8" transform="rotate(-90 16 ' + r1((YT + YB) / 2) + ')">Survival (%)</text>');
+    // x axis ticks/labels (months)
+    [0, 6, 12, 18, 24].forEach(function (t) {
+      var x = r1(mx(t));
+      s.push('<line x1="' + x + '" y1="' + YB + '" x2="' + x + '" y2="' + (YB + 4) + '" stroke="currentColor" stroke-opacity="0.5"/>');
+      s.push('<text x="' + x + '" y="' + (YB + 16) + '" text-anchor="middle" font-size="10" fill-opacity="0.75">' + t + '</text>');
+    });
+    s.push('<text x="' + r1((X0 + X1) / 2) + '" y="' + (YB + 30) + '" text-anchor="middle" font-size="10" fill-opacity="0.85">Months after implant</text>');
+    // group reference curves
+    groups.forEach(function (g) {
+      s.push('<polyline points="' + curve(g.sc) + '" fill="none" stroke="' + g.c + '" stroke-width="1.6" stroke-opacity="0.65"/>');
+    });
+    // guide lines at 12 and 24 months
+    [12, 24].forEach(function (t) {
+      s.push('<line x1="' + r1(mx(t)) + '" y1="' + YT + '" x2="' + r1(mx(t)) + '" y2="' + YB + '" stroke="currentColor" stroke-opacity="0.18" stroke-dasharray="3 3"/>');
+    });
+    // patient curve + dots at 1 and 2 years
+    s.push('<polyline points="' + curve(patientScore) + '" fill="none" stroke="' + BLUE + '" stroke-width="2.6"/>');
+    [12, 24].forEach(function (t) {
+      var p = 100 * hm3Surv(patientScore, t);
+      var cx = r1(mx(t)), cy = r1(my(p));
+      s.push('<circle cx="' + cx + '" cy="' + cy + '" r="6" fill="' + BLUE + '" stroke="#fff" stroke-width="2"/>');
+      s.push('<text x="' + (cx - 6) + '" y="' + (cy - 10) + '" text-anchor="end" font-size="11" font-weight="700" fill="' + BLUE + '">' + Math.round(p) + '%</text>');
+    });
+    // legend
+    var ly = 300;
+    var items = [
+      { c: GREEN, lab: 'Higher-than-avg' }, { c: AMBER, lab: 'Average' },
+      { c: RED, lab: 'Lower-than-avg' }, { c: BLUE, lab: 'This patient' }
+    ];
+    var lx = X0;
+    items.forEach(function (it) {
+      s.push('<line x1="' + lx + '" y1="' + ly + '" x2="' + (lx + 16) + '" y2="' + ly + '" stroke="' + it.c + '" stroke-width="3"/>');
+      s.push('<text x="' + (lx + 20) + '" y="' + (ly + 4) + '" font-size="10" fill-opacity="0.85">' + it.lab + '</text>');
+      lx += 24 + it.lab.length * 5.6 + 8;
+    });
+    s.push('</svg>');
+    return s.join('');
+  }
+
   /* ---------- INTERMACS profiles ---------- */
   CARDIO.register({
     id: 'intermacs-profile',
@@ -215,6 +291,66 @@
     notes: 'Continuous-flow LVAD 90-day mortality model. HMRS = 0.0274×age(yr) − 0.723×albumin(g/dL) + 0.74×creatinine(mg/dL) + 1.136×INR + 0.807×(1 if low-volume center, else 0). Risk groups and the graph reproduce Cowger et al. 2013 (Low <1.58, Medium 1.58–2.48, High >2.48; predicted 90-day mortality ~8/11/25%). Discrimination in later registry validations was modest (AUC ~0.60–0.70) — interpret alongside INTERMACS profile, RV function, and the full clinical picture. Verify against the primary publication before clinical use.',
     refs: [
       'Cowger J et al. Predicting survival in patients receiving continuous flow left ventricular assist devices: the HeartMate II risk score. J Am Coll Cardiol 2013;61:313-21.'
+    ]
+  });
+
+  /* ---------- HeartMate 3 Risk Score (HM3RS) — local calculator + survival curves ---------- */
+  CARDIO.register({
+    id: 'hm3rs',
+    name: 'HeartMate 3 Risk Score (HM3RS)',
+    category: 'advhf',
+    short: '1- and 2-year survival after HeartMate 3 (fully magnetically levitated) LVAD',
+    keywords: ['lvad', 'heartmate 3', 'hm3', 'hm3rs', 'survival', 'momentum 3', 'destination therapy'],
+    kind: 'custom',
+    inputs: [
+      { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 90, step: 1, placeholder: 'e.g. 60' },
+      { id: 'priorsurg', label: 'Prior cardiac surgery (CABG or valve)', type: 'check' },
+      { id: 'sodium', label: 'Serum sodium', type: 'number', unit: 'mEq/L', min: 110, max: 160, step: 1, placeholder: 'e.g. 137' },
+      { id: 'bun', label: 'Blood urea nitrogen (BUN)', type: 'number', unit: 'mg/dL', min: 2, max: 200, step: 1, placeholder: 'e.g. 24', hint: 'Urea (mmol/L) ÷ 0.357 = BUN (mg/dL)' },
+      { id: 'lvedd', label: 'LV end-diastolic diameter', type: 'number', unit: 'cm', min: 3, max: 9, step: 0.1, placeholder: 'e.g. 6.5', hint: 'Enters the model as an indicator: LVEDD < 5.5 cm adds risk' },
+      { id: 'rap', label: 'Right atrial pressure (RAP)', type: 'number', unit: 'mmHg', min: 0, max: 40, step: 1, placeholder: 'e.g. 8' },
+      { id: 'pcwp', label: 'Pulmonary capillary wedge pressure (PCWP)', type: 'number', unit: 'mmHg', min: 1, max: 55, step: 1, placeholder: 'e.g. 18', hint: 'RAP/PCWP > 0.6 adds risk' }
+    ],
+    compute: function (v) {
+      if (v.age == null || v.sodium == null || v.bun == null || v.lvedd == null || v.rap == null || v.pcwp == null) return null;
+      if (v.pcwp <= 0 || v.sodium <= 0) return null;
+      var ratio = v.rap / v.pcwp;
+      var lveddInd = v.lvedd < 5.5 ? 1 : 0;
+      var ratioInd = ratio > 0.6 ? 1 : 0;
+      var score = 5.59
+        + 0.0348 * v.age
+        + 0.53 * (v.priorsurg ? 1 : 0)
+        - 0.041 * v.sodium
+        + 0.0107 * v.bun
+        + 0.62 * lveddInd
+        + 0.44 * ratioInd;
+      var surv1 = Math.pow(0.9928, Math.exp(score)) * 100;
+      var surv2 = Math.pow(0.9880, Math.exp(score)) * 100;
+
+      var level, badge, grp;
+      if (score < 2.41) { level = 'low'; badge = 'Higher-than-average survival'; grp = 'Higher-than-average expected survival'; }
+      else if (score < 2.97) { level = 'mod'; badge = 'Average survival'; grp = 'Average expected survival'; }
+      else { level = 'high'; badge = 'Lower-than-average survival'; grp = 'Lower-than-average expected survival'; }
+
+      var detail =
+        'Predicted survival: ' + surv1.toFixed(0) + '% at 1 year · ' + surv2.toFixed(0) + '% at 2 years\n' +
+        'LVEDD < 5.5 cm: ' + (lveddInd ? 'yes (+0.62)' : 'no') + ' · RAP/PCWP = ' + ratio.toFixed(2) + ' (> 0.6: ' + (ratioInd ? 'yes, +0.44' : 'no') + ')\n' +
+        'Risk tertiles: higher < 2.41 · average 2.41–2.97 · lower > 2.97';
+
+      return {
+        value: score.toFixed(2),
+        unit: 'HM3RS',
+        badge: badge,
+        level: level,
+        text: grp + '. Predicted survival ≈ ' + surv1.toFixed(0) + '% at 1 year and ≈ ' + surv2.toFixed(0) + '% at 2 years.',
+        detail: detail,
+        svg: hm3Graph(score)
+      };
+    },
+    notes: 'Pre-implant survival model for the fully magnetically levitated HeartMate 3 LVAD, derived from MOMENTUM 3 (Mehra et al. 2022). Cox linear predictor: HM3RS = 5.59 + 0.0348·age + 0.53·(prior cardiac surgery) − 0.041·sodium + 0.0107·BUN + 0.62·(LVEDD < 5.5 cm) + 0.44·(RAP/PCWP > 0.6). Predicted survival = S0(t)^exp(HM3RS) with S0 = 0.9928 (1 yr) and 0.9880 (2 yr). The graph shows the three risk-group survival curves with this patient plotted as dots at 1 and 2 years. IMPORTANT: the JACC article is paywalled; these coefficients were recovered from the authors’ own official online HM3RS calculator (they reproduce it to displayed precision) and the model structure was corroborated with secondary sources — the exact published decimals could not be read from the paper. Verify against the primary publication before clinical use.',
+    refs: [
+      'Mehra MR et al. Prediction of survival after implantation of a fully magnetically levitated left ventricular assist device. JACC Heart Fail 2022;10(12):948-959.',
+      'Authors’ official HM3RS calculator: codetoheal.shinyapps.io/HeartMate3RS'
     ]
   });
 
