@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f4c81">
+  <meta name="description" content="Cardiology risk score calculators: ACS, heart failure, AF, EP, PCI, cardiac surgery, preoperative assessment and more.">
+  <title>CardioScores — Cardiology Risk Calculators</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <header class="topbar">
+    <button id="backBtn" class="back-btn" aria-label="Back" hidden>&#8592;</button>
+    <h1 id="topTitle" class="top-title">CardioScores</h1>
+    <button id="homeBtn" class="home-btn" aria-label="Home">&#8962;</button>
+  </header>
+
+  <main id="view" class="view"></main>
+
+  <footer class="footer">
+    <p><strong>For use by healthcare professionals only.</strong> Clinical decision-support aid — does not replace clinical judgment. Verify results against primary sources before acting on them.</p>
+  </footer>
+
+  <div id="disclaimerModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h2>Before you continue</h2>
+      <p>CardioScores is an educational, clinical decision-support tool intended for use by qualified healthcare professionals.</p>
+      <ul>
+        <li>Scores are calculated from published algorithms, but transcription or implementation errors are possible. <strong>Always verify against the primary reference before clinical use.</strong></li>
+        <li>A few complex or proprietary models (e.g., STS PROM, STS/ACC TVT, ACS NSQIP, SYNTAX II, Seattle HFM, MEESSI) are <strong>simplified local reproductions or approximations</strong> — each says so in its own notes. Use the official tool for reporting.</li>
+        <li>No score replaces clinical judgment, guidelines, or local protocols.</li>
+        <li>No patient data is transmitted or stored; all calculations run on your device.</li>
+      </ul>
+      <button id="acceptDisclaimer" class="btn-primary">I understand — I am a healthcare professional</button>
+    </div>
+  </div>
+
+  <!-- Registry (categories) must load first -->
+  <script src="js/registry.js"></script>
+  <!-- Calculator definitions -->
+  <script src="js/calculators/prevention.js"></script>
+  <script src="js/calculators/acs.js"></script>
+  <script src="js/calculators/ischemia.js"></script>
+  <script src="js/calculators/heart-failure.js"></script>
+  <script src="js/calculators/af-anticoagulation.js"></script>
+  <script src="js/calculators/ep-syncope.js"></script>
+  <script src="js/calculators/ecg.js"></script>
+  <script src="js/calculators/pci.js"></script>
+  <script src="js/calculators/cardiac-surgery.js"></script>
+  <script src="js/calculators/preop.js"></script>
+  <script src="js/calculators/vte-aorta.js"></script>
+  <script src="js/calculators/advanced-hf.js"></script>
+  <script src="js/calculators/congenital-pregnancy.js"></script>
+  <script src="js/calculators/imaging-valves.js"></script>
+  <script src="js/calculators/misc.js"></script>
+  <!-- Engine last -->
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () { /* offline support unavailable */ });
+      });
+    }
+  </script>
+</body>
+</html>

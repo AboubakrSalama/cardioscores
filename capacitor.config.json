@@ -1,0 +1,11 @@
+{
+  "appId": "com.cardioscores.app",
+  "appName": "CardioScores",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

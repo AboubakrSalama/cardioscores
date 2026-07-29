@@ -1,0 +1,9 @@
+# Netlify: static site, no build step. Publishes the www/ folder.
+[build]
+  publish = "www"
+  command = ""
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
