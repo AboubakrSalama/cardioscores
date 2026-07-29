@@ -4,13 +4,14 @@ The web app is a **static site** in `www/` (no build step, no backend). It uses 
 
 Pick one of the paths below.
 
-## Option A — GitHub Pages (free, via the GitHub CLI already signed in)
-A workflow is included at `.github/workflows/deploy-pages.yml` that publishes `www/` to Pages on every push to `main`.
+## Option A — GitHub Pages (free)
+The repo already exists (private) at **github.com/AboubakrSalama/cardioscores**.
+A ready-to-use Pages workflow is saved at `deploy/github-pages-workflow.yml`. To enable Pages:
+1. In GitHub: **Add file → Create new file**, name it `.github/workflows/deploy-pages.yml`, and paste the contents of `deploy/github-pages-workflow.yml`. (Adding it via the web UI avoids the CLI `workflow`-scope restriction.)
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Make the repo public (Settings → General → Danger Zone) when you're ready.
 
-```bash
-gh repo create cardioscores --public --source . --push
-```
-Then in the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**. The site goes live at `https://<user>.github.io/cardioscores/`.
+The site goes live at `https://aboubakrsalama.github.io/cardioscores/`. (All asset links are relative, so the `/cardioscores/` subpath works without changes.)
 
 > Because the site is served from a `/cardioscores/` subpath on Pages, all asset links in the app are already relative (`./…`), so it works without changes.
 
