@@ -29,10 +29,10 @@ npx vercel --prod
 ## Custom domain
 All three hosts let you attach a custom domain for free once the site is live.
 
-### Custom domain: cardiacrisk.app (chosen)
-The site is live on GitHub Pages, so wiring `cardiacrisk.app` takes three steps. **Do them in this order to avoid downtime** (adding the CNAME before DNS resolves would break the live `github.io` URL).
+### Custom domain: cardiacrisk.info (chosen)
+The site is live on GitHub Pages, so wiring `cardiacrisk.info` takes three steps. **Do them in this order to avoid downtime** (adding the CNAME before DNS resolves would break the live `github.io` URL).
 
-1. **Register** `cardiacrisk.app` at a registrar (Cloudflare, Namecheap, or Porkbun). `.app` requires HTTPS — that's fine, Pages issues a free certificate.
+1. **Register** `cardiacrisk.info` at a registrar (Namecheap, Porkbun, or Cloudflare). Unlike `.app`, `.info` does not force HTTPS — but GitHub Pages still issues a free certificate, so enable "Enforce HTTPS" anyway.
 2. **Add DNS records** at the registrar for the apex domain:
 
    | Type | Host/Name | Value |
@@ -47,9 +47,9 @@ The site is live on GitHub Pages, so wiring `cardiacrisk.app` takes three steps.
    | AAAA | `@` | `2606:50c0:8003::153` |
    | CNAME | `www` | `aboubakrsalama.github.io.` |
 
-3. **Activate on GitHub** (once DNS above is saved): copy `deploy/CNAME` into the site root — i.e., set the Pages custom domain to `cardiacrisk.app` (Settings → Pages → Custom domain), or push a `CNAME` file containing `cardiacrisk.app` to the `gh-pages` branch. Then tick **Enforce HTTPS** after the certificate is issued (can take up to an hour).
+3. **Activate on GitHub** (once DNS above is saved): copy `deploy/CNAME` into the site root — i.e., set the Pages custom domain to `cardiacrisk.info` (Settings → Pages → Custom domain), or push a `CNAME` file containing `cardiacrisk.info` to the `gh-pages` branch. Then tick **Enforce HTTPS** after the certificate is issued (can take up to an hour).
 
-After that, `https://cardiacrisk.app` serves the app. (I can do step 3 for you the moment steps 1–2 are done.)
+After that, `https://cardiacrisk.info` serves the app. (I can do step 3 for you the moment steps 1–2 are done.)
 
 ## Before going public (medical software)
 - Have a cardiologist verify the calculators against primary sources — especially the regression models and the 7 flagged approximations (see the in-app disclaimer).
