@@ -311,7 +311,8 @@
 
   /* Preferred unit system (remembered across calculators). 'si' = metric base, 'us' = US/Imperial. */
   function getUnitPref() {
-    try { return localStorage.getItem('cardio_units') === 'us' ? 'us' : 'si'; } catch (e) { return 'si'; }
+    // null until the user explicitly picks a system → each input shows its base unit (status quo).
+    try { var v = localStorage.getItem('cardio_units'); return (v === 'us' || v === 'si') ? v : null; } catch (e) { return null; }
   }
   function setUnitPref(sys) {
     try { localStorage.setItem('cardio_units', sys === 'us' ? 'us' : 'si'); } catch (e) { /* ignore */ }

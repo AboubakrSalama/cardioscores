@@ -15,7 +15,7 @@
     inputs: [
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 120, step: 1, placeholder: 'e.g., 72' },
       { id: 'weight', label: 'Body weight', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 20, max: 250, step: 0.5, placeholder: 'e.g., 80' },
-      { id: 'scr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', min: 0.2, max: 15, step: 0.1, placeholder: 'e.g., 1.1', hint: 'SI: divide µmol/L by 88.4' },
+      { id: 'scr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.2, max: 15, step: 0.1, placeholder: 'e.g., 1.1', hint: 'SI: divide µmol/L by 88.4' },
       { id: 'sex', label: 'Sex', type: 'select', options: [
         { label: 'Male', value: 'male', points: 0 },
         { label: 'Female', value: 'female', points: 0 }

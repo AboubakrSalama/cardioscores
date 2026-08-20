@@ -253,8 +253,8 @@
     kind: 'custom',
     inputs: [
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 90, step: 1, placeholder: 'e.g. 60' },
-      { id: 'albumin', label: 'Serum albumin', type: 'number', unit: 'g/dL', min: 1, max: 6, step: 0.1, placeholder: 'e.g. 3.5', hint: 'g/L ÷ 10 = g/dL' },
-      { id: 'creatinine', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', min: 0.2, max: 12, step: 0.1, placeholder: 'e.g. 1.2', hint: 'µmol/L ÷ 88.4 = mg/dL' },
+      { id: 'albumin', label: 'Serum albumin', type: 'number', unit: 'g/dL', units: [{ label: 'g/dL', factor: 1, system: 'us' }, { label: 'g/L', factor: 0.1, system: 'si' }], min: 1, max: 6, step: 0.1, placeholder: 'e.g. 3.5', hint: 'g/L ÷ 10 = g/dL' },
+      { id: 'creatinine', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.2, max: 12, step: 0.1, placeholder: 'e.g. 1.2', hint: 'µmol/L ÷ 88.4 = mg/dL' },
       { id: 'inr', label: 'INR (off warfarin)', type: 'number', unit: '', min: 0.7, max: 8, step: 0.1, placeholder: 'e.g. 1.2' },
       { id: 'lowvol', label: 'Low-volume implanting center', type: 'check', hint: 'Center performing few continuous-flow LVAD implants (≤ 15 in the trial period). Leave unchecked for high-volume centers.' }
     ],
@@ -306,7 +306,7 @@
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 90, step: 1, placeholder: 'e.g. 60' },
       { id: 'priorsurg', label: 'Prior cardiac surgery (CABG or valve)', type: 'check' },
       { id: 'sodium', label: 'Serum sodium', type: 'number', unit: 'mEq/L', min: 110, max: 160, step: 1, placeholder: 'e.g. 137' },
-      { id: 'bun', label: 'Blood urea nitrogen (BUN)', type: 'number', unit: 'mg/dL', min: 2, max: 200, step: 1, placeholder: 'e.g. 24', hint: 'Urea (mmol/L) ÷ 0.357 = BUN (mg/dL)' },
+      { id: 'bun', label: 'Blood urea nitrogen (BUN)', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L urea', factor: 2.8, system: 'si' }], min: 2, max: 200, step: 1, placeholder: 'e.g. 24', hint: 'Urea (mmol/L) ÷ 0.357 = BUN (mg/dL)' },
       { id: 'lvedd', label: 'LV end-diastolic diameter', type: 'number', unit: 'cm', min: 3, max: 9, step: 0.1, placeholder: 'e.g. 6.5', hint: 'Enters the model as an indicator: LVEDD < 5.5 cm adds risk' },
       { id: 'rap', label: 'Right atrial pressure (RAP)', type: 'number', unit: 'mmHg', min: 0, max: 40, step: 1, placeholder: 'e.g. 8' },
       { id: 'pcwp', label: 'Pulmonary capillary wedge pressure (PCWP)', type: 'number', unit: 'mmHg', min: 1, max: 55, step: 1, placeholder: 'e.g. 18', hint: 'RAP/PCWP > 0.6 adds risk' }
@@ -363,8 +363,8 @@
     keywords: ['meld', 'liver', 'renal', 'bilirubin', 'creatinine', 'lvad', 'transplant', 'cardiohepatic'],
     kind: 'custom',
     inputs: [
-      { id: 'bili', label: 'Total bilirubin', type: 'number', unit: 'mg/dL', min: 0.1, max: 50, step: 0.1, placeholder: 'e.g., 1.2', hint: 'µmol/L ÷ 17.1 = mg/dL' },
-      { id: 'cr', label: 'Creatinine', type: 'number', unit: 'mg/dL', min: 0.1, max: 15, step: 0.1, placeholder: 'e.g., 1.0', hint: 'µmol/L ÷ 88.4 = mg/dL. Values above 4.0 are capped at 4.0.' }
+      { id: 'bili', label: 'Total bilirubin', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.05848, system: 'si' }], min: 0.1, max: 50, step: 0.1, placeholder: 'e.g., 1.2', hint: 'µmol/L ÷ 17.1 = mg/dL' },
+      { id: 'cr', label: 'Creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.1, max: 15, step: 0.1, placeholder: 'e.g., 1.0', hint: 'µmol/L ÷ 88.4 = mg/dL. Values above 4.0 are capped at 4.0.' }
     ],
     compute: function (v) {
       if (v.bili === null || v.cr === null) return null;
@@ -400,8 +400,8 @@
     keywords: ['meld', 'liver', 'inr', 'bilirubin', 'creatinine', 'lvad', 'transplant'],
     kind: 'custom',
     inputs: [
-      { id: 'bili', label: 'Total bilirubin', type: 'number', unit: 'mg/dL', min: 0.1, max: 50, step: 0.1, placeholder: 'e.g., 1.2', hint: 'µmol/L ÷ 17.1 = mg/dL' },
-      { id: 'cr', label: 'Creatinine', type: 'number', unit: 'mg/dL', min: 0.1, max: 15, step: 0.1, placeholder: 'e.g., 1.0', hint: 'µmol/L ÷ 88.4 = mg/dL. Values above 4.0 are capped at 4.0.' },
+      { id: 'bili', label: 'Total bilirubin', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.05848, system: 'si' }], min: 0.1, max: 50, step: 0.1, placeholder: 'e.g., 1.2', hint: 'µmol/L ÷ 17.1 = mg/dL' },
+      { id: 'cr', label: 'Creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.1, max: 15, step: 0.1, placeholder: 'e.g., 1.0', hint: 'µmol/L ÷ 88.4 = mg/dL. Values above 4.0 are capped at 4.0.' },
       { id: 'inr', label: 'INR', type: 'number', unit: '', min: 0.5, max: 20, step: 0.1, placeholder: 'e.g., 1.1' },
       { id: 'dialysis', label: 'Dialysis at least twice in the past week (or 24 h of CVVHD)', type: 'check', points: 0, hint: 'If checked, creatinine is set to 4.0 mg/dL per UNOS convention' }
     ],

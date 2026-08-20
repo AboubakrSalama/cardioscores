@@ -123,9 +123,9 @@
     keywords: ['adhere', 'cart', 'acute heart failure', 'in-hospital mortality', 'decompensated'],
     kind: 'custom',
     inputs: [
-      { id: 'bun', label: 'Blood urea nitrogen (BUN)', type: 'number', unit: 'mg/dL', min: 1, max: 300, step: 1, placeholder: 'e.g. 40', hint: 'Branch point at 43 mg/dL (≈ 15.35 mmol/L urea)' },
+      { id: 'bun', label: 'Blood urea nitrogen (BUN)', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L urea', factor: 2.8, system: 'si' }], min: 1, max: 300, step: 1, placeholder: 'e.g. 40', hint: 'Branch point at 43 mg/dL (≈ 15.35 mmol/L urea)' },
       { id: 'sbp', label: 'Systolic blood pressure on admission', type: 'number', unit: 'mmHg', min: 40, max: 300, step: 1, placeholder: 'e.g. 120', hint: 'Branch point at 115 mmHg' },
-      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', min: 0.1, max: 20, step: 0.01, placeholder: 'e.g. 1.5', hint: 'Branch point at 2.75 mg/dL (only used when BUN ≥ 43 and SBP < 115)' }
+      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.1, max: 20, step: 0.01, placeholder: 'e.g. 1.5', hint: 'Branch point at 2.75 mg/dL (only used when BUN ≥ 43 and SBP < 115)' }
     ],
     compute: function (v) {
       if (v.bun === null || v.sbp === null) return null;
@@ -268,7 +268,7 @@
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 110, step: 1, placeholder: 'e.g. 70' },
       { id: 'ef', label: 'Ejection fraction (LVEF)', type: 'number', unit: '%', min: 1, max: 95, step: 1, placeholder: 'e.g. 30' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 50, max: 260, step: 1, placeholder: 'e.g. 120' },
-      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'µmol/L', min: 20, max: 1500, step: 1, placeholder: 'e.g. 110', hint: 'To convert from mg/dL, multiply by 88.4.' },
+      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'µmol/L', units: [{ label: 'µmol/L', factor: 1, system: 'si' }, { label: 'mg/dL', factor: 88.4, system: 'us' }], min: 20, max: 1500, step: 1, placeholder: 'e.g. 110', hint: 'To convert from mg/dL, multiply by 88.4.' },
       { id: 'bmi', label: 'Body mass index', type: 'number', unit: 'kg/m²', min: 10, max: 60, step: 0.1, placeholder: 'e.g. 26' },
       { id: 'nyha', label: 'NYHA class', type: 'select', options: [
         { label: 'Class I', value: 1, points: 0 },
@@ -402,7 +402,7 @@
       { id: 'ef', label: 'Ejection fraction (LVEF)', type: 'number', unit: '%', min: 1, max: 95, step: 1, placeholder: 'e.g. 25' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 50, max: 260, step: 1, placeholder: 'e.g. 110' },
       { id: 'sodium', label: 'Serum sodium', type: 'number', unit: 'mmol/L', min: 110, max: 160, step: 1, placeholder: 'e.g. 138' },
-      { id: 'hgb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', min: 4, max: 20, step: 0.1, placeholder: 'e.g. 13' },
+      { id: 'hgb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', units: [{ label: 'g/dL', factor: 1, system: 'us' }, { label: 'g/L', factor: 0.1, system: 'si' }], min: 4, max: 20, step: 0.1, placeholder: 'e.g. 13' },
       { id: 'nyha', label: 'NYHA class', type: 'select', options: [
         { label: 'Class I', value: 1, points: 0 },
         { label: 'Class II', value: 2, points: 0 },
@@ -469,7 +469,7 @@
     inputs: [
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 110, step: 1, placeholder: 'e.g. 78' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 50, max: 260, step: 1, placeholder: 'e.g. 120' },
-      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', min: 0.2, max: 15, step: 0.1, placeholder: 'e.g. 1.4' },
+      { id: 'cr', label: 'Serum creatinine', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'µmol/L', factor: 0.011312, system: 'si' }], min: 0.2, max: 15, step: 0.1, placeholder: 'e.g. 1.4' },
       { id: 'potassium', label: 'Serum potassium', type: 'number', unit: 'mmol/L', min: 2, max: 8, step: 0.1, placeholder: 'e.g. 4.2' },
       { id: 'spo2', label: 'Oxygen saturation (SpO₂)', type: 'number', unit: '%', min: 50, max: 100, step: 1, placeholder: 'e.g. 94' },
       { id: 'rr', label: 'Respiratory rate', type: 'number', unit: '/min', min: 6, max: 60, step: 1, placeholder: 'e.g. 22' },

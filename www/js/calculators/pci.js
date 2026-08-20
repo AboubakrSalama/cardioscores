@@ -186,7 +186,7 @@
     inputs: [
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 18, max: 110, step: 1, placeholder: 'e.g., 72', hint: 'Nomogram truncated 50–90 years' },
       { id: 'crcl', label: 'Creatinine clearance (Cockcroft-Gault)', type: 'number', unit: 'mL/min', min: 0, max: 200, step: 1, placeholder: 'e.g., 55', hint: 'Truncated at 100 mL/min (values ≥100 add 0)' },
-      { id: 'hgb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', min: 4, max: 20, step: 0.1, placeholder: 'e.g., 11.5', hint: 'Truncated 10–12 g/dL' },
+      { id: 'hgb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', units: [{ label: 'g/dL', factor: 1, system: 'us' }, { label: 'g/L', factor: 0.1, system: 'si' }], min: 4, max: 20, step: 0.1, placeholder: 'e.g., 11.5', hint: 'Truncated 10–12 g/dL' },
       { id: 'wbc', label: 'White blood cell count', type: 'number', unit: '×10⁹/L', min: 1, max: 50, step: 0.1, placeholder: 'e.g., 8.5', hint: 'Truncated 5–20 ×10⁹/L' },
       { id: 'bleed', label: 'Prior spontaneous bleeding', hint: 'Documented prior spontaneous bleeding requiring medical attention', type: 'check' }
     ],
