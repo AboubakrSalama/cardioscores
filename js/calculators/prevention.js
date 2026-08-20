@@ -25,8 +25,8 @@
         { label: 'African American / Black', value: 'black', points: 0 }
       ] },
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 40, max: 79, step: 1, placeholder: 'e.g., 55', hint: 'Validated for 40–79 years' },
-      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', min: 100, max: 430, step: 1, placeholder: 'e.g., 213' },
-      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', min: 20, max: 100, step: 1, placeholder: 'e.g., 50' },
+      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 100, max: 430, step: 1, placeholder: 'e.g., 213' },
+      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 20, max: 100, step: 1, placeholder: 'e.g., 50' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 90, max: 200, step: 1, placeholder: 'e.g., 120' },
       { id: 'treated', label: 'On blood-pressure treatment', type: 'check' },
       { id: 'smoker', label: 'Current smoker', type: 'check' },
@@ -120,8 +120,8 @@
         { label: 'Female', value: 'female', points: 0 }
       ] },
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 30, max: 74, step: 1, placeholder: 'e.g., 55', hint: 'Validated for 30–74 years' },
-      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', min: 100, max: 400, step: 1, placeholder: 'e.g., 213' },
-      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', min: 10, max: 100, step: 1, placeholder: 'e.g., 50' },
+      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 100, max: 400, step: 1, placeholder: 'e.g., 213' },
+      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 10, max: 100, step: 1, placeholder: 'e.g., 50' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 90, max: 200, step: 1, placeholder: 'e.g., 125' },
       { id: 'treated', label: 'On blood-pressure treatment', type: 'check' },
       { id: 'smoker', label: 'Current smoker', type: 'check' },
@@ -202,8 +202,8 @@
       ] },
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 40, max: 89, step: 1, placeholder: 'e.g., 55', hint: '40–69 uses SCORE2; 70–89 uses SCORE2-OP' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 90, max: 200, step: 1, placeholder: 'e.g., 140' },
-      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mmol/L', min: 2.5, max: 12, step: 0.1, placeholder: 'e.g., 5.5', hint: 'mmol/L (mg/dL ÷ 38.67)' },
-      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mmol/L', min: 0.5, max: 3.5, step: 0.1, placeholder: 'e.g., 1.3', hint: 'mmol/L (mg/dL ÷ 38.67)' },
+      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mmol/L', units: [{ label: 'mmol/L', factor: 1, system: 'si' }, { label: 'mg/dL', factor: 0.02586, system: 'us' }], min: 2.5, max: 12, step: 0.1, placeholder: 'e.g., 5.5', hint: 'mmol/L (mg/dL ÷ 38.67)' },
+      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mmol/L', units: [{ label: 'mmol/L', factor: 1, system: 'si' }, { label: 'mg/dL', factor: 0.02586, system: 'us' }], min: 0.5, max: 3.5, step: 0.1, placeholder: 'e.g., 1.3', hint: 'mmol/L (mg/dL ÷ 38.67)' },
       { id: 'smoker', label: 'Current smoker', type: 'check' }
     ],
     compute: function (v) {
@@ -487,8 +487,8 @@
         { label: 'Female', value: 'female', points: 0 }
       ] },
       { id: 'age', label: 'Age', type: 'number', unit: 'years', min: 30, max: 79, step: 1, placeholder: 'e.g., 55', hint: 'Validated for 30–79 years' },
-      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', min: 100, max: 400, step: 1, placeholder: 'e.g., 200' },
-      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', min: 20, max: 100, step: 1, placeholder: 'e.g., 45' },
+      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 100, max: 400, step: 1, placeholder: 'e.g., 200' },
+      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 20, max: 100, step: 1, placeholder: 'e.g., 45' },
       { id: 'sbp', label: 'Systolic blood pressure', type: 'number', unit: 'mmHg', min: 90, max: 200, step: 1, placeholder: 'e.g., 130' },
       { id: 'egfr', label: 'eGFR', type: 'number', unit: 'mL/min/1.73m²', min: 15, max: 140, step: 1, placeholder: 'e.g., 90' },
       { id: 'treated', label: 'On blood-pressure treatment', type: 'check' },
@@ -562,9 +562,9 @@
     keywords: ['ldl', 'friedewald', 'non-hdl', 'lipid panel', 'cholesterol ratio'],
     kind: 'custom',
     inputs: [
-      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', min: 50, max: 600, step: 1, placeholder: 'e.g., 200' },
-      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', min: 10, max: 150, step: 1, placeholder: 'e.g., 50' },
-      { id: 'tg', label: 'Triglycerides', type: 'number', unit: 'mg/dL', min: 20, max: 2000, step: 1, placeholder: 'e.g., 150' }
+      { id: 'tc', label: 'Total cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 50, max: 600, step: 1, placeholder: 'e.g., 200' },
+      { id: 'hdl', label: 'HDL cholesterol', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 38.67, system: 'si' }], min: 10, max: 150, step: 1, placeholder: 'e.g., 50' },
+      { id: 'tg', label: 'Triglycerides', type: 'number', unit: 'mg/dL', units: [{ label: 'mg/dL', factor: 1, system: 'us' }, { label: 'mmol/L', factor: 88.57, system: 'si' }], min: 20, max: 2000, step: 1, placeholder: 'e.g., 150' }
     ],
     compute: function (v) {
       var tc = v.tc, hdl = v.hdl, tg = v.tg;
