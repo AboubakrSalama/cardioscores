@@ -555,14 +555,14 @@
         { label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }
       ] },
       { id: 'dage', label: 'Donor age', type: 'number', unit: 'years', min: 1, max: 90, step: 1, placeholder: 'e.g. 30' },
-      { id: 'dht', label: 'Donor height', type: 'number', unit: 'cm', min: 100, max: 220, step: 1, placeholder: 'e.g. 178' },
-      { id: 'dwt', label: 'Donor weight', type: 'number', unit: 'kg', min: 20, max: 250, step: 0.5, placeholder: 'e.g. 80' },
+      { id: 'dht', label: 'Donor height', type: 'number', unit: 'cm', units: [{ label: 'cm', factor: 1, system: 'si' }, { label: 'in', factor: 2.54, system: 'us' }], min: 100, max: 220, step: 1, placeholder: 'e.g. 178' },
+      { id: 'dwt', label: 'Donor weight', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 20, max: 250, step: 0.5, placeholder: 'e.g. 80' },
       { id: 'rsex', label: 'Recipient sex', type: 'select', options: [
         { label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }
       ] },
       { id: 'rage', label: 'Recipient age', type: 'number', unit: 'years', min: 1, max: 90, step: 1, placeholder: 'e.g. 55' },
-      { id: 'rht', label: 'Recipient height', type: 'number', unit: 'cm', min: 100, max: 220, step: 1, placeholder: 'e.g. 175' },
-      { id: 'rwt', label: 'Recipient weight', type: 'number', unit: 'kg', min: 20, max: 250, step: 0.5, placeholder: 'e.g. 85' }
+      { id: 'rht', label: 'Recipient height', type: 'number', unit: 'cm', units: [{ label: 'cm', factor: 1, system: 'si' }, { label: 'in', factor: 2.54, system: 'us' }], min: 100, max: 220, step: 1, placeholder: 'e.g. 175' },
+      { id: 'rwt', label: 'Recipient weight', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 20, max: 250, step: 0.5, placeholder: 'e.g. 85' }
     ],
     compute: function (v) {
       if (v.dage == null || v.dht == null || v.dwt == null || v.rage == null || v.rht == null || v.rwt == null) return null;

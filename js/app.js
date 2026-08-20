@@ -163,7 +163,7 @@
       Object.keys(controls).forEach(function (k) {
         var c = controls[k];
         if (c.type === 'checkbox') c.checked = false;
-        else if (c.tagName === 'SELECT') c.selectedIndex = 0;
+        else if (c.tagName === 'SELECT') { if (!c._applyUnit) c.selectedIndex = 0; } // keep the chosen unit
         else c.value = '';
       });
       update();
@@ -186,8 +186,15 @@
           vals[inp.id + '__points'] = opt.points || 0;
         } else if (inp.type === 'number') {
           var raw = c.value.trim();
-          vals[inp.id] = raw === '' ? null : parseFloat(raw);
-          if (vals[inp.id] !== null && isNaN(vals[inp.id])) vals[inp.id] = null;
+          var val = raw === '' ? null : parseFloat(raw);
+          if (val !== null && isNaN(val)) val = null;
+          if (val !== null && inp.units && inp.units.length > 1) {
+            var usel = controls[inp.id + '__unitsel'];
+            var u = inp.units[usel ? usel.selectedIndex : 0];
+            var f = (u && u.factor != null) ? u.factor : 1;
+            val = val * f; // convert entered value to the calculator's base unit
+          }
+          vals[inp.id] = val;
         }
       });
       return vals;
@@ -262,18 +269,52 @@
       var num = el('input', {
         type: 'number',
         inputmode: 'decimal',
-        min: inp.min != null ? inp.min : '',
-        max: inp.max != null ? inp.max : '',
         step: inp.step != null ? inp.step : 'any',
         placeholder: inp.placeholder || ''
       });
       num.addEventListener('input', onChange);
       controls[inp.id] = num;
-      var wrap = el('div', {}, [num]);
-      row.appendChild(wrap);
-      if (inp.unit) labelEl.appendChild(el('span', { class: 'unit-suffix', text: '(' + inp.unit + ')' }));
+
+      if (inp.units && inp.units.length > 1) {
+        // Dual-unit input (e.g., kg/lb, cm/in): dropdown converts to the base unit.
+        var usel = el('select', { class: 'unit-select', 'aria-label': 'Unit for ' + inp.label });
+        inp.units.forEach(function (u) { usel.appendChild(el('option', { text: u.label })); });
+        var pref = getUnitPref();
+        inp.units.forEach(function (u, i) { if (u.system === pref) usel.selectedIndex = i; });
+
+        var applyUnit = function () {
+          var u = inp.units[usel.selectedIndex] || inp.units[0];
+          var f = (u.factor != null) ? u.factor : 1;
+          if (inp.min != null) num.min = Math.round((inp.min / f) * 100) / 100; else num.removeAttribute('min');
+          if (inp.max != null) num.max = Math.round((inp.max / f) * 100) / 100; else num.removeAttribute('max');
+          num.placeholder = (usel.selectedIndex === 0 && inp.placeholder) ? inp.placeholder : '';
+        };
+        usel._applyUnit = applyUnit;
+        applyUnit();
+        usel.addEventListener('change', function () {
+          applyUnit();
+          var u = inp.units[usel.selectedIndex];
+          if (u && u.system) setUnitPref(u.system);
+          onChange();
+        });
+        controls[inp.id + '__unitsel'] = usel;
+        row.appendChild(el('div', { class: 'num-with-unit' }, [num, usel]));
+      } else {
+        if (inp.min != null) num.setAttribute('min', inp.min);
+        if (inp.max != null) num.setAttribute('max', inp.max);
+        row.appendChild(el('div', {}, [num]));
+        if (inp.unit) labelEl.appendChild(el('span', { class: 'unit-suffix', text: '(' + inp.unit + ')' }));
+      }
     }
     return row;
+  }
+
+  /* Preferred unit system (remembered across calculators). 'si' = metric base, 'us' = US/Imperial. */
+  function getUnitPref() {
+    try { return localStorage.getItem('cardio_units') === 'us' ? 'us' : 'si'; } catch (e) { return 'si'; }
+  }
+  function setUnitPref(sys) {
+    try { localStorage.setItem('cardio_units', sys === 'us' ? 'us' : 'si'); } catch (e) { /* ignore */ }
   }
 
   function pickBand(bands, score) {
