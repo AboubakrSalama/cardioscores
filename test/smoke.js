@@ -61,7 +61,7 @@ for (const c of CARDIO.calculators) {
   for (const inp of c.inputs) {
     if (!inp.id || seen.has(inp.id)) fail(tag + ': missing/duplicate input id ' + inp.id);
     seen.add(inp.id);
-    if (!['check', 'select', 'number'].includes(inp.type)) fail(tag + '.' + inp.id + ': bad input type ' + inp.type);
+    if (!['check', 'select', 'number', 'height'].includes(inp.type)) fail(tag + '.' + inp.id + ': bad input type ' + inp.type);
     if (inp.type === 'select' && (!Array.isArray(inp.options) || inp.options.length < 2)) {
       fail(tag + '.' + inp.id + ': select needs >=2 options');
     }
@@ -102,6 +102,8 @@ for (const c of CARDIO.calculators) {
         const v = ('value' in o) ? o.value : (o.points || 0);
         empty[inp.id] = v; filled[inp.id] = v;
         empty[inp.id + '__points'] = o.points || 0; filled[inp.id + '__points'] = o.points || 0;
+      } else if (inp.type === 'height') {
+        empty[inp.id] = null; filled[inp.id] = 170; // compute() receives height as cm
       } else {
         empty[inp.id] = null;
         filled[inp.id] = (typeof inp.min === 'number' ? inp.min : 0) || 50;

@@ -1,6 +1,6 @@
 /* CardioScores service worker — offline-first for bedside use.
  * Bump CACHE when any asset below changes so clients pick up the update. */
-var CACHE = 'cardioscores-v5';
+var CACHE = 'cardioscores-v6';
 var ASSETS = [
   './',
   './index.html',

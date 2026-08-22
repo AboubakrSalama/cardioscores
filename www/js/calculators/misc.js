@@ -57,7 +57,7 @@
     keywords: ['bsa', 'mosteller', 'du bois', 'dubois', 'surface area', 'indexing'],
     kind: 'custom',
     inputs: [
-      { id: 'height', label: 'Height', type: 'number', unit: 'cm', units: [{ label: 'cm', factor: 1, system: 'si' }, { label: 'in', factor: 2.54, system: 'us' }], min: 50, max: 250, step: 0.5, placeholder: 'e.g., 175' },
+      { id: 'height', label: 'Height', type: 'height' },
       { id: 'weight', label: 'Weight', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 2, max: 300, step: 0.1, placeholder: 'e.g., 80' }
     ],
     compute: function (v) {
@@ -89,7 +89,7 @@
     keywords: ['bmi', 'body mass index', 'obesity', 'who class', 'overweight'],
     kind: 'custom',
     inputs: [
-      { id: 'height', label: 'Height', type: 'number', unit: 'cm', units: [{ label: 'cm', factor: 1, system: 'si' }, { label: 'in', factor: 2.54, system: 'us' }], min: 50, max: 250, step: 0.5, placeholder: 'e.g., 175' },
+      { id: 'height', label: 'Height', type: 'height' },
       { id: 'weight', label: 'Weight', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 2, max: 400, step: 0.1, placeholder: 'e.g., 80' }
     ],
     compute: function (v) {
