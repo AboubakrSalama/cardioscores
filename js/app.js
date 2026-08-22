@@ -195,6 +195,9 @@
             val = val * f; // convert entered value to the calculator's base unit
           }
           vals[inp.id] = val;
+        } else if (inp.type === 'height') {
+          var ha = controls[inp.id + '__a'], hb = controls[inp.id + '__b'], hs = controls[inp.id + '__sys'];
+          vals[inp.id] = heightToCm(ha.value, hb.value, hs && hs.selectedIndex === 1);
         }
       });
       return vals;
@@ -305,6 +308,50 @@
         row.appendChild(el('div', {}, [num]));
         if (inp.unit) labelEl.appendChild(el('span', { class: 'unit-suffix', text: '(' + inp.unit + ')' }));
       }
+    } else if (inp.type === 'height') {
+      // Compound height: metres+cm (metric) or feet+inches (US). Converts to cm.
+      var sys = el('select', { class: 'unit-select', 'aria-label': 'Height units for ' + inp.label });
+      sys.appendChild(el('option', { text: 'm + cm' }));
+      sys.appendChild(el('option', { text: 'ft + in' }));
+      sys.selectedIndex = (getUnitPref() === 'us') ? 1 : 0;
+
+      var fa = el('input', { type: 'number', inputmode: 'decimal', step: 'any', min: 0 });
+      var fb = el('input', { type: 'number', inputmode: 'decimal', step: 'any', min: 0 });
+      var la = el('span', { class: 'h-unit' });
+      var lb = el('span', { class: 'h-unit' });
+      fa.addEventListener('input', onChange);
+      fb.addEventListener('input', onChange);
+
+      var relabel = function () {
+        var us = sys.selectedIndex === 1;
+        la.textContent = us ? 'ft' : 'm';
+        lb.textContent = us ? 'in' : 'cm';
+        fa.placeholder = us ? '5' : '1';
+        fb.placeholder = us ? '9' : '75';
+      };
+      var prevUs = sys.selectedIndex === 1;
+      sys.addEventListener('change', function () {
+        var nowUs = sys.selectedIndex === 1;
+        var cm = heightToCm(fa.value, fb.value, prevUs);
+        if (cm != null) {
+          if (nowUs) { var tin = cm / 2.54; var ft = Math.floor(tin / 12); fa.value = ft; fb.value = Math.round((tin - ft * 12) * 10) / 10; }
+          else { var m = Math.floor(cm / 100); fa.value = m; fb.value = Math.round((cm - m * 100) * 10) / 10; }
+        }
+        relabel();
+        prevUs = nowUs;
+        setUnitPref(nowUs ? 'us' : 'si');
+        onChange();
+      });
+      sys._applyUnit = relabel; // marks it a unit control → kept on Reset
+      relabel();
+      controls[inp.id + '__a'] = fa;
+      controls[inp.id + '__b'] = fb;
+      controls[inp.id + '__sys'] = sys;
+      row.appendChild(el('div', { class: 'height-row' }, [
+        el('div', { class: 'height-field' }, [fa, la]),
+        el('div', { class: 'height-field' }, [fb, lb]),
+        sys
+      ]));
     }
     return row;
   }
@@ -316,6 +363,16 @@
   }
   function setUnitPref(sys) {
     try { localStorage.setItem('cardio_units', sys === 'us' ? 'us' : 'si'); } catch (e) { /* ignore */ }
+  }
+
+  /* Combine a two-part height entry into centimetres (the base unit compute() expects).
+   * Metric: metres + cm.  US: feet + inches.  Returns null only if both boxes are empty. */
+  function heightToCm(aVal, bVal, isUs) {
+    var ea = (aVal == null || String(aVal).trim() === '');
+    var eb = (bVal == null || String(bVal).trim() === '');
+    if (ea && eb) return null;
+    var na = parseFloat(aVal) || 0, nb = parseFloat(bVal) || 0;
+    return isUs ? (na * 12 + nb) * 2.54 : (na * 100 + nb);
   }
 
   function pickBand(bands, score) {
