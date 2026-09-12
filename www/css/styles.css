@@ -279,6 +279,7 @@ html, body {
 }
 .conclusions-block ul { margin: 0; padding-left: 20px; }
 .conclusions-block li { margin: 5px 0; font-size: 0.95rem; line-height: 1.45; }
+.conclusions-single { margin: 0; font-size: 0.95rem; line-height: 1.45; }
 
 .notes-block, .refs-block {
   margin-top: 16px;

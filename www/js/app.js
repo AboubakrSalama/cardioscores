@@ -392,7 +392,11 @@
     var line = el('p', { class: 'score-line', text: out.value });
     if (out.unit) line.appendChild(el('span', { class: 'unit', text: out.unit }));
     panel.appendChild(line);
-    if (out.text) panel.appendChild(el('p', { class: 'interp', text: out.text }));
+    // Placeholder / incomplete state keeps a plain guidance line and no Conclusions box.
+    if (out.noBadge) {
+      if (out.text) panel.appendChild(el('p', { class: 'interp', text: out.text }));
+      return;
+    }
     if (out.detail) panel.appendChild(el('p', { class: 'detail', text: out.detail }));
     if (out.svg) {
       // out.svg is a trusted, calculator-generated SVG string (never user input).
@@ -400,11 +404,18 @@
       chart.innerHTML = out.svg;
       panel.appendChild(chart);
     }
-    if (out.conclusions && out.conclusions.length) {
+    // Every result ends with a plain-language Conclusions box: the rich list when a
+    // calculator supplies one, otherwise its single interpretation line.
+    var items = (out.conclusions && out.conclusions.length) ? out.conclusions : (out.text ? [out.text] : []);
+    if (items.length) {
       var cb = el('div', { class: 'conclusions-block' }, [el('h4', { class: 'conclusions-title', text: 'Conclusions' })]);
-      var ul = el('ul');
-      out.conclusions.forEach(function (c) { ul.appendChild(el('li', { text: c })); });
-      cb.appendChild(ul);
+      if (items.length === 1) {
+        cb.appendChild(el('p', { class: 'conclusions-single', text: items[0] }));
+      } else {
+        var ul = el('ul');
+        items.forEach(function (c) { ul.appendChild(el('li', { text: c })); });
+        cb.appendChild(ul);
+      }
       panel.appendChild(cb);
     }
   }
