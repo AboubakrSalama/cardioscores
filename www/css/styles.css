@@ -255,6 +255,31 @@ html, body {
 }
 .result-chart svg { width: 100%; height: auto; display: block; }
 
+.conclusions-block {
+  margin-top: 16px;
+  padding: 12px 14px 12px;
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--brand);
+  border-radius: 10px;
+  background: rgba(15, 76, 129, 0.06);
+}
+@media (prefers-color-scheme: dark) {
+  .conclusions-block { background: rgba(84, 148, 201, 0.10); }
+}
+.conclusions-title {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand);
+}
+@media (prefers-color-scheme: dark) {
+  .conclusions-title { color: #9cc6ea; }
+}
+.conclusions-block ul { margin: 0; padding-left: 20px; }
+.conclusions-block li { margin: 5px 0; font-size: 0.95rem; line-height: 1.45; }
+
 .notes-block, .refs-block {
   margin-top: 16px;
   font-size: 0.85rem;
