@@ -708,6 +708,50 @@
         if (hb != null && avDiff != null) push('Arterio-venous O₂ difference', f(1.34 * hb * (avDiff / 100), 1), 'mL/dL', null);
       }
 
+      // ---- Diagnostic conclusion (synthesis) ----
+      var concl = [];
+      // Pulmonary hypertension + 2022 ESC/ERS haemodynamic subclass
+      if (mpap != null) {
+        if (mpap <= 20) {
+          concl.push('No pulmonary hypertension (mean PA ' + f(mpap, 0) + ' ≤ 20 mmHg).');
+        } else {
+          var ph = 'Pulmonary hypertension: mean PA ' + f(mpap, 0) + ' > 20 mmHg';
+          if (pcwp != null && pvrWU != null) {
+            if (pcwp <= 15 && pvrWU > 2) ph += ' → PRE-capillary PH (PCWP ≤15, PVR >2 WU).';
+            else if (pcwp > 15 && pvrWU <= 2) ph += ' → isolated POST-capillary PH / IpcPH (PCWP >15, PVR ≤2 WU).';
+            else if (pcwp > 15 && pvrWU > 2) ph += ' → COMBINED pre- & post-capillary PH / CpcPH (PCWP >15, PVR >2 WU).';
+            else ph += ' → unclassified: normal PVR (≤2) and wedge (≤15) — consider a high-output state.';
+          } else if (pcwp != null) {
+            ph += pcwp > 15 ? ' with elevated wedge (post-capillary component) — add cardiac output for PVR to finish subclassing.' : ' with normal wedge — add cardiac output for PVR to confirm pre-capillary.';
+          } else {
+            ph += ' — enter PCWP and cardiac output (for PVR) to subclassify pre-/post-capillary.';
+          }
+          concl.push(ph);
+        }
+      }
+      // Left-sided filling
+      if (pcwp != null) concl.push(pcwp > 15 ? 'Elevated left-heart filling pressure (PCWP ' + f(pcwp, 0) + ' > 15 mmHg) — pulmonary congestion.' : 'Normal left-heart filling pressure (PCWP ' + f(pcwp, 0) + ' mmHg).');
+      // RV function / failing RV
+      var rvf = [];
+      if (ra != null && ra > 14) rvf.push('↑RAP ' + f(ra, 0));
+      if (raPcwp != null && raPcwp > 0.63) rvf.push('RAP/PCWP ' + f(raPcwp, 2) + ' >0.63');
+      if (papi != null && papi < 1.0) rvf.push('PAPi ' + f(papi, 2) + ' <1.0');
+      if (rvf.length >= 2) concl.push('Findings suggest RV dysfunction / failing RV (' + rvf.join(', ') + ').');
+      else if (rvf.length === 1) concl.push('Possible early RV strain (' + rvf.join(', ') + ') — interpret with the full picture.');
+      else if (ra != null && (raPcwp != null || papi != null)) concl.push('RV indices preserved (RAP, RAP/PCWP, PAPi within normal).');
+      // Output / shock / congestion profile
+      if (ci != null) {
+        if (cpo != null && cpo < 0.6) concl.push('Low-output state — cardiogenic-shock hemodynamics (CI ' + f(ci, 2) + ', CPO ' + f(cpo, 2) + ' W < 0.6).');
+        else if (ci < 2.2) concl.push('Low cardiac index (' + f(ci, 2) + ' < 2.2) — reduced systemic output.');
+        else concl.push('Adequate cardiac index (' + f(ci, 2) + ').');
+        if (pcwp != null) {
+          var cold = ci < 2.2, wet = pcwp > 18;
+          var prof = cold ? (wet ? 'C — cold & wet' : 'L — cold & dry') : (wet ? 'B — warm & wet' : 'A — warm & dry');
+          concl.push('Hemodynamic profile: ' + prof + ' (CI ' + (cold ? '<2.2' : '≥2.2') + ', PCWP ' + (wet ? '>18' : '≤18') + ').');
+        }
+      }
+      if (concl.length) { L.push(''); L.push('— Conclusion —'); concl.forEach(function (x) { L.push('• ' + x); }); }
+
       var level = 'info', text;
       if (co != null) {
         var flags = [];
