@@ -608,6 +608,7 @@
       { id: 'hr', label: 'Heart rate', type: 'number', unit: 'bpm', min: 20, max: 220, step: 1, placeholder: 'e.g. 80' },
       { id: 'height', label: 'Height (for BSA / indexing)', type: 'height' },
       { id: 'weight', label: 'Weight (for BSA / indexing)', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 2, max: 400, step: 0.1, placeholder: 'e.g. 80' },
+      { id: 'bsa', label: 'BSA (optional — overrides height & weight)', type: 'number', unit: 'm²', min: 0.5, max: 3.5, step: 0.01, placeholder: 'e.g. 1.9', hint: 'Enter a known/measured BSA to use it directly instead of computing it from height and weight.' },
       { id: 'hb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', units: [{ label: 'g/dL', factor: 1, system: 'us' }, { label: 'g/L', factor: 0.1, system: 'si' }], min: 2, max: 25, step: 0.1, placeholder: 'e.g. 13' },
       { id: 'sao2', label: 'Arterial O₂ saturation (SaO₂)', type: 'number', unit: '%', min: 40, max: 100, step: 1, placeholder: 'e.g. 98' },
       { id: 'svo2', label: 'Mixed venous O₂ saturation (SvO₂, from PA)', type: 'number', unit: '%', min: 10, max: 95, step: 1, placeholder: 'e.g. 65' },
@@ -628,7 +629,10 @@
           ht = n(v.height), wt = n(v.weight);
       function f(x, d) { return (x == null || !isFinite(x)) ? '—' : x.toFixed(d == null ? 2 : d); }
 
-      var bsa = (ht != null && wt != null && ht > 0 && wt > 0) ? Math.sqrt(ht * wt / 3600) : null;
+      var bsaDirect = n(v.bsa);
+      var bsa = (bsaDirect != null && bsaDirect > 0)
+        ? bsaDirect
+        : ((ht != null && wt != null && ht > 0 && wt > 0) ? Math.sqrt(ht * wt / 3600) : null);
       var mpap = (pas != null && pad != null) ? (pas + 2 * pad) / 3 : null;
 
       var vo2used = null, vo2est = false;
