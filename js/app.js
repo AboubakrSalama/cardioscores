@@ -400,6 +400,13 @@
       chart.innerHTML = out.svg;
       panel.appendChild(chart);
     }
+    if (out.conclusions && out.conclusions.length) {
+      var cb = el('div', { class: 'conclusions-block' }, [el('h4', { class: 'conclusions-title', text: 'Conclusions' })]);
+      var ul = el('ul');
+      out.conclusions.forEach(function (c) { ul.appendChild(el('li', { text: c })); });
+      cb.appendChild(ul);
+      panel.appendChild(cb);
+    }
   }
 
   function appendNotesRefs(page, calc) {

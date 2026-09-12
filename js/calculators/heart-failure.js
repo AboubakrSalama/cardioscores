@@ -708,49 +708,46 @@
         if (hb != null && avDiff != null) push('Arterio-venous O₂ difference', f(1.34 * hb * (avDiff / 100), 1), 'mL/dL', null);
       }
 
-      // ---- Diagnostic conclusion (synthesis) ----
+      // ---- Plain-language conclusions (rendered as their own section) ----
       var concl = [];
-      // Pulmonary hypertension + 2022 ESC/ERS haemodynamic subclass
+      // Pulmonary artery pressure and where it comes from
       if (mpap != null) {
         if (mpap <= 20) {
-          concl.push('No pulmonary hypertension (mean PA ' + f(mpap, 0) + ' ≤ 20 mmHg).');
+          concl.push('Pulmonary artery pressure is normal (mean ' + f(mpap, 0) + ' mmHg).');
         } else {
-          var ph = 'Pulmonary hypertension: mean PA ' + f(mpap, 0) + ' > 20 mmHg';
+          var pre = 'Pulmonary artery pressure is high (mean ' + f(mpap, 0) + ' mmHg)';
           if (pcwp != null && pvrWU != null) {
-            if (pcwp <= 15 && pvrWU > 2) ph += ' → PRE-capillary PH (PCWP ≤15, PVR >2 WU).';
-            else if (pcwp > 15 && pvrWU <= 2) ph += ' → isolated POST-capillary PH / IpcPH (PCWP >15, PVR ≤2 WU).';
-            else if (pcwp > 15 && pvrWU > 2) ph += ' → COMBINED pre- & post-capillary PH / CpcPH (PCWP >15, PVR >2 WU).';
-            else ph += ' → unclassified: normal PVR (≤2) and wedge (≤15) — consider a high-output state.';
+            if (pcwp <= 15 && pvrWU > 2) concl.push(pre + ', coming from the lung blood vessels — pre-capillary.');
+            else if (pcwp > 15 && pvrWU <= 2) concl.push(pre + ', caused by high left-heart pressure — post-capillary (backward).');
+            else if (pcwp > 15 && pvrWU > 2) concl.push(pre + ', from both the left heart and the lung vessels — combined.');
+            else concl.push(pre + ' with normal resistance — likely a high-flow state, not fixed lung-vessel disease.');
           } else if (pcwp != null) {
-            ph += pcwp > 15 ? ' with elevated wedge (post-capillary component) — add cardiac output for PVR to finish subclassing.' : ' with normal wedge — add cardiac output for PVR to confirm pre-capillary.';
+            concl.push(pre + (pcwp > 15 ? ' with a high wedge — add cardiac output to confirm the cause.' : ' with a normal wedge — add cardiac output to confirm the cause.'));
           } else {
-            ph += ' — enter PCWP and cardiac output (for PVR) to subclassify pre-/post-capillary.';
+            concl.push(pre + ' — add wedge pressure and cardiac output to find the cause.');
           }
-          concl.push(ph);
         }
       }
-      // Left-sided filling
-      if (pcwp != null) concl.push(pcwp > 15 ? 'Elevated left-heart filling pressure (PCWP ' + f(pcwp, 0) + ' > 15 mmHg) — pulmonary congestion.' : 'Normal left-heart filling pressure (PCWP ' + f(pcwp, 0) + ' mmHg).');
-      // RV function / failing RV
+      // Left-heart filling / congestion
+      if (pcwp != null) concl.push(pcwp > 15 ? 'Left-heart filling pressure is high (wedge ' + f(pcwp, 0) + ') — fluid is backing up toward the lungs.' : 'Left-heart filling pressure is normal (wedge ' + f(pcwp, 0) + ').');
+      // Right ventricle
       var rvf = [];
-      if (ra != null && ra > 14) rvf.push('↑RAP ' + f(ra, 0));
-      if (raPcwp != null && raPcwp > 0.63) rvf.push('RAP/PCWP ' + f(raPcwp, 2) + ' >0.63');
-      if (papi != null && papi < 1.0) rvf.push('PAPi ' + f(papi, 2) + ' <1.0');
-      if (rvf.length >= 2) concl.push('Findings suggest RV dysfunction / failing RV (' + rvf.join(', ') + ').');
-      else if (rvf.length === 1) concl.push('Possible early RV strain (' + rvf.join(', ') + ') — interpret with the full picture.');
-      else if (ra != null && (raPcwp != null || papi != null)) concl.push('RV indices preserved (RAP, RAP/PCWP, PAPi within normal).');
-      // Output / shock / congestion profile
+      if (ra != null && ra > 14) rvf.push('high right-atrial pressure');
+      if (raPcwp != null && raPcwp > 0.63) rvf.push('RA/wedge ratio ' + f(raPcwp, 2));
+      if (papi != null && papi < 1.0) rvf.push('low PAPi ' + f(papi, 2));
+      if (rvf.length >= 2) concl.push('The right ventricle looks weak / failing (' + rvf.join(', ') + ').');
+      else if (rvf.length === 1) concl.push('Early sign of right-ventricle strain (' + rvf.join(', ') + ').');
+      else if (ra != null && (raPcwp != null || papi != null)) concl.push('Right-ventricle function looks preserved.');
+      // Output / shock / overall picture
       if (ci != null) {
-        if (cpo != null && cpo < 0.6) concl.push('Low-output state — cardiogenic-shock hemodynamics (CI ' + f(ci, 2) + ', CPO ' + f(cpo, 2) + ' W < 0.6).');
-        else if (ci < 2.2) concl.push('Low cardiac index (' + f(ci, 2) + ' < 2.2) — reduced systemic output.');
-        else concl.push('Adequate cardiac index (' + f(ci, 2) + ').');
+        if (cpo != null && cpo < 0.6) concl.push('The heart is pumping far too little — shock range (index ' + f(ci, 2) + ', power ' + f(cpo, 2) + ' W).');
+        else if (ci < 2.2) concl.push('Low output — the heart is pumping less than the body needs (index ' + f(ci, 2) + ').');
+        else concl.push('Cardiac output is adequate (index ' + f(ci, 2) + ').');
         if (pcwp != null) {
           var cold = ci < 2.2, wet = pcwp > 18;
-          var prof = cold ? (wet ? 'C — cold & wet' : 'L — cold & dry') : (wet ? 'B — warm & wet' : 'A — warm & dry');
-          concl.push('Hemodynamic profile: ' + prof + ' (CI ' + (cold ? '<2.2' : '≥2.2') + ', PCWP ' + (wet ? '>18' : '≤18') + ').');
+          concl.push('Overall picture: ' + (cold ? (wet ? 'cold & wet — low output with congestion.' : 'cold & dry — low output, no congestion.') : (wet ? 'warm & wet — adequate output but congested.' : 'warm & dry — adequate output, no congestion.')));
         }
       }
-      if (concl.length) { L.push(''); L.push('— Conclusion —'); concl.forEach(function (x) { L.push('• ' + x); }); }
 
       var level = 'info', text;
       if (co != null) {
@@ -771,7 +768,8 @@
         level: level,
         badge: co != null ? null : 'Hemodynamic panel',
         text: text,
-        detail: L.join('\n')
+        detail: L.join('\n'),
+        conclusions: concl.length ? concl : undefined
       };
     },
     notes: 'Formulas: Fick CO = VO₂ / (13.4 × Hb × (SaO₂ − SvO₂)); mPAP = (PAsys + 2·PAdia)/3; SVR = 80·(MAP − RAP)/CO; PVR = (mPAP − PCWP)/CO [Wood units, ×80 for dyn·s·cm⁻⁵]; PAPi = (PAsys − PAdia)/RAP; CPO = MAP·CO/451; RVSWI = 0.0136·(mPAP − RAP)·SVI; LVSWI = 0.0136·(MAP − PCWP)·SVI; PA compliance = SV/(PAsys − PAdia). VO₂ if not measured is assumed at 125 mL/min/m² (indirect Fick — less accurate; measured or thermodilution CO is preferred, especially with shunts, severe TR or low output). Reference cut-offs shown are conventional adult values. Verify against your lab’s conventions and the primary literature before clinical use.',
