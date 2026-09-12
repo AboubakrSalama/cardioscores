@@ -596,4 +596,144 @@
     ]
   });
 
+  /* ---------- Right heart catheterization / Swan-Ganz hemodynamics ---------- */
+  CARDIO.register({
+    id: 'rhc-hemodynamics',
+    name: 'Right Heart Cath / Swan-Ganz Hemodynamics',
+    category: 'hf',
+    short: 'Full hemodynamic panel: Fick CO, PVR, SVR, PAPi, CPO, gradients and more',
+    keywords: ['rhc', 'right heart cath', 'swan-ganz', 'swan ganz', 'hemodynamics', 'haemodynamics', 'fick', 'cardiac output', 'cardiac index', 'pvr', 'svr', 'papi', 'cardiac power', 'wood units', 'pcwp', 'wedge', 'pulmonary hypertension', 'cardiogenic shock', 'tpg', 'dpg', 'stroke work'],
+    kind: 'custom',
+    inputs: [
+      { id: 'hr', label: 'Heart rate', type: 'number', unit: 'bpm', min: 20, max: 220, step: 1, placeholder: 'e.g. 80' },
+      { id: 'height', label: 'Height (for BSA / indexing)', type: 'height' },
+      { id: 'weight', label: 'Weight (for BSA / indexing)', type: 'number', unit: 'kg', units: [{ label: 'kg', factor: 1, system: 'si' }, { label: 'lb', factor: 0.45359237, system: 'us' }], min: 2, max: 400, step: 0.1, placeholder: 'e.g. 80' },
+      { id: 'hb', label: 'Hemoglobin', type: 'number', unit: 'g/dL', units: [{ label: 'g/dL', factor: 1, system: 'us' }, { label: 'g/L', factor: 0.1, system: 'si' }], min: 2, max: 25, step: 0.1, placeholder: 'e.g. 13' },
+      { id: 'sao2', label: 'Arterial O₂ saturation (SaO₂)', type: 'number', unit: '%', min: 40, max: 100, step: 1, placeholder: 'e.g. 98' },
+      { id: 'svo2', label: 'Mixed venous O₂ saturation (SvO₂, from PA)', type: 'number', unit: '%', min: 10, max: 95, step: 1, placeholder: 'e.g. 65' },
+      { id: 'vo2', label: 'O₂ consumption (VO₂)', type: 'number', unit: 'mL/min', min: 80, max: 600, step: 5, placeholder: 'blank → estimate 125 × BSA', hint: 'Measured VO₂ is most accurate. Leave blank to assume 125 mL/min/m² (indirect Fick).' },
+      { id: 'map', label: 'Mean arterial pressure (MAP)', type: 'number', unit: 'mmHg', min: 30, max: 200, step: 1, placeholder: 'e.g. 90' },
+      { id: 'ra', label: 'Right atrial mean pressure (RAP)', type: 'number', unit: 'mmHg', min: -5, max: 40, step: 1, placeholder: 'e.g. 8' },
+      { id: 'rvs', label: 'RV systolic pressure', type: 'number', unit: 'mmHg', min: 5, max: 150, step: 1, placeholder: 'e.g. 30' },
+      { id: 'rvd', label: 'RV end-diastolic pressure', type: 'number', unit: 'mmHg', min: -5, max: 50, step: 1, placeholder: 'e.g. 6' },
+      { id: 'pas', label: 'PA systolic pressure', type: 'number', unit: 'mmHg', min: 5, max: 150, step: 1, placeholder: 'e.g. 30' },
+      { id: 'pad', label: 'PA diastolic pressure', type: 'number', unit: 'mmHg', min: 2, max: 80, step: 1, placeholder: 'e.g. 12' },
+      { id: 'pcwp', label: 'PCWP (pulmonary capillary wedge, mean)', type: 'number', unit: 'mmHg', min: 1, max: 50, step: 1, placeholder: 'e.g. 12' }
+    ],
+    compute: function (v) {
+      function n(x) { return (x == null || isNaN(x)) ? null : x; }
+      var hr = n(v.hr), map = n(v.map), ra = n(v.ra), rvs = n(v.rvs), rvd = n(v.rvd),
+          pas = n(v.pas), pad = n(v.pad), pcwp = n(v.pcwp), hb = n(v.hb),
+          sao2 = n(v.sao2), svo2 = n(v.svo2), vo2 = n(v.vo2),
+          ht = n(v.height), wt = n(v.weight);
+      function f(x, d) { return (x == null || !isFinite(x)) ? '—' : x.toFixed(d == null ? 2 : d); }
+
+      var bsa = (ht != null && wt != null && ht > 0 && wt > 0) ? Math.sqrt(ht * wt / 3600) : null;
+      var mpap = (pas != null && pad != null) ? (pas + 2 * pad) / 3 : null;
+
+      var vo2used = null, vo2est = false;
+      if (vo2 != null) vo2used = vo2;
+      else if (bsa != null) { vo2used = 125 * bsa; vo2est = true; }
+
+      var avDiff = (sao2 != null && svo2 != null) ? (sao2 - svo2) : null; // %
+      var co = null;
+      if (vo2used != null && hb != null && avDiff != null && avDiff > 0) {
+        co = vo2used / (13.4 * hb * (avDiff / 100)); // L/min
+      }
+      var ci = (co != null && bsa != null) ? co / bsa : null;
+      var sv = (co != null && hr != null && hr > 0) ? co * 1000 / hr : null;
+      var svi = (sv != null && bsa != null) ? sv / bsa : null;
+
+      var svr = (map != null && ra != null && co != null && co > 0) ? (map - ra) / co * 80 : null;
+      var svri = (map != null && ra != null && ci != null && ci > 0) ? (map - ra) / ci * 80 : null;
+      var pvrWU = (mpap != null && pcwp != null && co != null && co > 0) ? (mpap - pcwp) / co : null;
+      var pvr = (pvrWU != null) ? pvrWU * 80 : null;
+      var tpr = (mpap != null && co != null && co > 0) ? mpap / co * 80 : null;
+
+      var tpg = (mpap != null && pcwp != null) ? mpap - pcwp : null;
+      var dpg = (pad != null && pcwp != null) ? pad - pcwp : null;
+      var papi = (pas != null && pad != null && ra != null && ra > 0) ? (pas - pad) / ra : null;
+      var raPcwp = (ra != null && pcwp != null && pcwp > 0) ? ra / pcwp : null;
+
+      var cpo = (map != null && co != null) ? map * co / 451 : null;
+      var rvswi = (mpap != null && ra != null && svi != null) ? 0.0136 * (mpap - ra) * svi : null;
+      var lvswi = (map != null && pcwp != null && svi != null) ? 0.0136 * (map - pcwp) * svi : null;
+      var pac = (sv != null && pas != null && pad != null && (pas - pad) > 0) ? sv / (pas - pad) : null;
+
+      if (co == null && mpap == null && svr == null && papi == null && raPcwp == null && tpg == null) return null;
+
+      var L = [];
+      function push(label, val, unit, flag) { L.push(label + ': ' + val + (unit ? (' ' + unit) : '') + (flag ? ('  — ' + flag) : '')); }
+
+      L.push('— Cardiac output & flow —');
+      push('Fick cardiac output', f(co, 2), 'L/min', vo2est ? 'VO₂ assumed 125×BSA (indirect Fick)' : null);
+      push('Cardiac index', f(ci, 2), 'L/min/m²', (ci != null && ci < 2.2) ? 'low (<2.2)' : (ci != null ? 'normal 2.5–4.0' : null));
+      push('Stroke volume', f(sv, 0), 'mL', null);
+      push('Stroke volume index', f(svi, 0), 'mL/m²', null);
+
+      L.push('');
+      L.push('— Resistances —');
+      push('SVR', f(svr, 0), 'dyn·s·cm⁻⁵', (svr != null ? (svr < 800 ? 'low (<800)' : svr > 1200 ? 'high (>1200)' : 'normal 800–1200') : null));
+      push('SVR index', f(svri, 0), 'dyn·s·cm⁻⁵·m²', null);
+      push('PVR', f(pvrWU, 2), 'Wood units', (pvrWU != null ? (pvrWU > 2 ? 'elevated (>2 WU)' : 'normal (≤2 WU)') : null));
+      push('PVR', f(pvr, 0), 'dyn·s·cm⁻⁵', null);
+      push('Total pulmonary resistance', f(tpr, 0), 'dyn·s·cm⁻⁵', null);
+
+      L.push('');
+      L.push('— Pressures & gradients —');
+      push('Mean PA pressure', f(mpap, 0), 'mmHg', (mpap != null ? (mpap >= 20 ? 'pulmonary hypertension (≥20)' : 'normal (<20)') : null));
+      push('Transpulmonary gradient', f(tpg, 0), 'mmHg', (tpg != null && tpg > 12 ? 'elevated (>12)' : null));
+      push('Diastolic pulmonary gradient', f(dpg, 0), 'mmHg', (dpg != null && dpg >= 7 ? 'pre-/post-capillary (≥7)' : null));
+
+      L.push('');
+      L.push('— RV / RA function —');
+      push('PAPi (PA pulsatility index)', f(papi, 2), '', (papi != null ? (papi < 0.9 ? 'low → RV failure risk (<0.9; <1.85 pre-LVAD)' : 'preserved') : null));
+      push('RAP / PCWP ratio', f(raPcwp, 2), '', (raPcwp != null && raPcwp > 0.63 ? 'RV dysfunction (>0.63)' : null));
+
+      L.push('');
+      L.push('— Power & stroke work —');
+      push('Cardiac power output', f(cpo, 2), 'W', (cpo != null ? (cpo < 0.6 ? 'poor prognosis in shock (<0.6 W)' : 'adequate (≥0.6 W)') : null));
+      push('RV stroke work index', f(rvswi, 1), 'g·m/m²', null);
+      push('LV stroke work index', f(lvswi, 1), 'g·m/m²', null);
+      push('PA compliance', f(pac, 2), 'mL/mmHg', (pac != null && pac < 2 ? 'reduced (<2)' : null));
+
+      if (avDiff != null || svo2 != null) {
+        L.push('');
+        L.push('— Oxygenation —');
+        if (svo2 != null) push('Mixed venous O₂ (SvO₂)', f(svo2, 0), '%', (svo2 < 60 ? 'low (<60%)' : 'normal 60–75%'));
+        if (hb != null && avDiff != null) push('Arterio-venous O₂ difference', f(1.34 * hb * (avDiff / 100), 1), 'mL/dL', null);
+      }
+
+      var level = 'info', text;
+      if (co != null) {
+        var flags = [];
+        if (ci != null && ci < 2.2) flags.push('low cardiac index');
+        if (cpo != null && cpo < 0.6) flags.push('low cardiac power');
+        if (pvrWU != null && pvrWU > 2) flags.push('elevated PVR');
+        if (papi != null && papi < 0.9) flags.push('low PAPi');
+        level = (cpo != null && cpo < 0.6) ? 'vhigh' : (ci != null && ci < 2.2) ? 'high' : (pvrWU != null && pvrWU > 2) ? 'mod' : 'low';
+        text = 'Fick CO ' + f(co, 2) + ' L/min' + (ci != null ? (' · CI ' + f(ci, 2) + ' L/min/m²') : '') + (flags.length ? (' — ' + flags.join(', ') + '.') : ' — key indices within normal ranges.');
+      } else {
+        text = 'Enter O₂ sats + hemoglobin (plus VO₂, or height & weight to estimate it) for Fick output; pressures alone give resistances, gradients, PAPi and ratios.';
+      }
+
+      return {
+        value: co != null ? f(co, 2) : '—',
+        unit: 'L/min (Fick CO)',
+        level: level,
+        badge: co != null ? null : 'Hemodynamic panel',
+        text: text,
+        detail: L.join('\n')
+      };
+    },
+    notes: 'Formulas: Fick CO = VO₂ / (13.4 × Hb × (SaO₂ − SvO₂)); mPAP = (PAsys + 2·PAdia)/3; SVR = 80·(MAP − RAP)/CO; PVR = (mPAP − PCWP)/CO [Wood units, ×80 for dyn·s·cm⁻⁵]; PAPi = (PAsys − PAdia)/RAP; CPO = MAP·CO/451; RVSWI = 0.0136·(mPAP − RAP)·SVI; LVSWI = 0.0136·(MAP − PCWP)·SVI; PA compliance = SV/(PAsys − PAdia). VO₂ if not measured is assumed at 125 mL/min/m² (indirect Fick — less accurate; measured or thermodilution CO is preferred, especially with shunts, severe TR or low output). Reference cut-offs shown are conventional adult values. Verify against your lab’s conventions and the primary literature before clinical use.',
+    refs: [
+      'Ragosta M. Textbook of Clinical Hemodynamics. 2nd ed. Elsevier; 2018.',
+      'Fick A. Über die Messung des Blutquantums in den Herzventrikeln. Sitzungsber Phys Med Ges Würzburg 1870.',
+      'Korabathina R et al. The pulmonary artery pulsatility index identifies severe right ventricular dysfunction in acute inferior MI. Catheter Cardiovasc Interv 2012;80:593-600.',
+      'Fincke R et al. Cardiac power is the strongest hemodynamic correlate of mortality in cardiogenic shock (SHOCK trial). J Am Coll Cardiol 2004;44:340-8.',
+      'Humbert M et al. 2022 ESC/ERS Guidelines for pulmonary hypertension. Eur Heart J 2022;43:3618-731.'
+    ]
+  });
+
 })();
